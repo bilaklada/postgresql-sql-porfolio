@@ -1,340 +1,460 @@
--- count how many films exist for each rating. Show: rating, number_of_films
-SELECT rating, count(*) AS number_of_films
+-- =========================================================
+-- File: 04_group_by.sql
+-- Database: PostgreSQL / dvdrental
+-- Topic: GROUP BY
+-- Purpose: Practice grouped aggregation using COUNT, SUM,
+--          AVG, MIN, and MAX across single-column and
+--          multi-column groupings, including filtering
+--          grouped results with HAVING.
+-- Author: Lada Bilak
+-- =========================================================
+
+-- =========================================================
+-- Section 1: Foundational GROUP BY queries
+-- =========================================================
+
+-- ---------------------------------------------------------
+-- 1. Count films by rating
+-- Goal: Measure how many film records exist within each
+--       rating category.
+-- ---------------------------------------------------------
+SELECT rating,
+       COUNT(*) AS number_of_films
 FROM film
 GROUP BY rating;
 
-
--- Count how many films exist for each rental_rate. Show: rental_rate, number_of_films
-SELECT rental_rate, count(*) AS number_of_films
+-- ---------------------------------------------------------
+-- 2. Count films by rental rate
+-- Goal: Measure how many films exist for each rental rate.
+-- ---------------------------------------------------------
+SELECT rental_rate,
+       COUNT(*) AS number_of_films
 FROM film
 GROUP BY rental_rate;
 
--- Find the average film length for each rating. Show: rating, average_length
-SELECT rating, avg(length) AS average_length
+-- ---------------------------------------------------------
+-- 3. Calculate average film length by rating
+-- Goal: Measure the average runtime for each rating group.
+-- ---------------------------------------------------------
+SELECT rating,
+       AVG(length) AS average_length
 FROM film
 GROUP BY rating;
 
--- Find the longest film length for each rating. Show: rating, max_length
-SELECT rating, max(length) AS max_length
+-- ---------------------------------------------------------
+-- 4. Calculate maximum film length by rating
+-- Goal: Identify the longest film within each rating group.
+-- ---------------------------------------------------------
+SELECT rating,
+       MAX(length) AS max_length
 FROM film
 GROUP BY rating;
 
--- Find the shortest film for each rating. Show:rating, min_length
-SELECT rating, min(length) AS min_length
+-- ---------------------------------------------------------
+-- 5. Calculate minimum film length by rating
+-- Goal: Identify the shortest film within each rating group.
+-- ---------------------------------------------------------
+SELECT rating,
+       MIN(length) AS min_length
 FROM film
 GROUP BY rating;
 
--- Find the total amount of money collected for each customer. Table: payment. Show: customer_id, total_paid
-SELECT customer_id, sum(amount) AS total_paid
+-- ---------------------------------------------------------
+-- 6. Calculate total amount paid by each customer
+-- Goal: Measure total payment volume at the customer level.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       SUM(amount) AS total_paid
 FROM payment
 GROUP BY customer_id;
 
--- Find the average payment amount for each customer. Show: customer_id, avg_payment. Show in asc order
-SELECT customer_id, avg(amount) AS avg_payment
-FROM payment
-GROUP BY customer_id
-ORDER BY customer_id;
-
--- Show: rating, number_of_films. Sort ratings by number_of_films (largest first).
-SELECT rating, count(*) AS number_of_films
-FROM film
-GROUP BY rating
-ORDER BY count(*) DESC;
-
--- Which customers made the largest total payments? Show: customer_id, total_paid. Sort by largest total first. Return 10 rows.
-SELECT customer_id, sum(amount) AS total_paid
-FROM payment
-GROUP BY customer_id
-ORDER BY sum(amount) DESC
-LIMIT 10;
-
-
--- GROUP BY PRACTICE — LEVEL 2
-
-
--- 1) Count how many customers belong to each store.
--- Table: customer
--- Show: store_id, number_of_customers
-SELECT store_id, count(*) AS number_of_customers
-FROM customer
-GROUP BY store_id;
-
-
-
--- 2) Find the average replacement cost for each rating.
--- Table: film
--- Show: rating, avg_replacement_cost
-SELECT rating, avg(replacement_cost) AS avg_replacement_cost
-FROM film
-GROUP BY rating;
-
-
--- 3) Find the total rental duration for each rating.
--- Table: film
--- Show: rating, total_rental_duration
-SELECT rating, sum(rental_duration) AS total_rental_duration
-FROM film
-GROUP BY rating;
-
-
--- 4) Count how many films there are for each length.
--- Table: film
--- Show: length, number_of_films
--- Sort by number_of_films descending
-SELECT length, count(*) AS number_of_films
-FROM film
-GROUP BY length 
-ORDER BY number_of_films DESC;
-
-
--- 5) Find the highest payment made by each customer.
--- Table: payment
--- Show: customer_id, highest_payment
--- Sort by highest_payment descending
-SELECT customer_id, max(amount) AS  highest_payment
-FROM payment
-GROUP BY customer_id
-ORDER BY highest_payment DESC;
-
-
--- 6) Find the lowest payment made by each customer.
--- Table: payment
--- Show: customer_id, lowest_payment
--- Sort by customer_id ascending
-SELECT customer_id, min(amount) AS  lowest_payment
+-- ---------------------------------------------------------
+-- 7. Calculate average payment amount by customer
+-- Goal: Measure mean payment value for each customer and
+--       sort output by customer identifier.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       AVG(amount) AS avg_payment
 FROM payment
 GROUP BY customer_id
 ORDER BY customer_id ASC;
 
+-- ---------------------------------------------------------
+-- 8. Count films by rating and sort by group size
+-- Goal: Rank rating categories by number of films from
+--       largest to smallest.
+-- ---------------------------------------------------------
+SELECT rating,
+       COUNT(*) AS number_of_films
+FROM film
+GROUP BY rating
+ORDER BY number_of_films DESC;
 
--- 7) Count how many payments were made by each customer.
--- Table: payment
--- Show: customer_id, number_of_payments
--- Sort by number_of_payments descending
-SELECT customer_id, count(*) AS number_of_payments
+-- ---------------------------------------------------------
+-- 9. Identify customers with the largest total payments
+-- Goal: Rank customers by cumulative payment amount and
+--       return the top 10.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       SUM(amount) AS total_paid
+FROM payment
+GROUP BY customer_id
+ORDER BY total_paid DESC
+LIMIT 10;
+
+-- =========================================================
+-- Section 2: Extended GROUP BY practice
+-- =========================================================
+
+-- ---------------------------------------------------------
+-- 10. Count customers by store
+-- Goal: Measure customer distribution across stores.
+-- ---------------------------------------------------------
+SELECT store_id,
+       COUNT(*) AS number_of_customers
+FROM customer
+GROUP BY store_id;
+
+-- ---------------------------------------------------------
+-- 11. Calculate average replacement cost by rating
+-- Goal: Measure average replacement cost within each film
+--       rating group.
+-- ---------------------------------------------------------
+SELECT rating,
+       AVG(replacement_cost) AS avg_replacement_cost
+FROM film
+GROUP BY rating;
+
+-- ---------------------------------------------------------
+-- 12. Calculate total rental duration by rating
+-- Goal: Measure the cumulative rental duration for films
+--       within each rating group.
+-- ---------------------------------------------------------
+SELECT rating,
+       SUM(rental_duration) AS total_rental_duration
+FROM film
+GROUP BY rating;
+
+-- ---------------------------------------------------------
+-- 13. Count films by exact length
+-- Goal: Measure how many films exist for each runtime value
+--       and rank the results by frequency.
+-- ---------------------------------------------------------
+SELECT length,
+       COUNT(*) AS number_of_films
+FROM film
+GROUP BY length
+ORDER BY number_of_films DESC;
+
+-- ---------------------------------------------------------
+-- 14. Calculate highest payment by customer
+-- Goal: Identify the maximum single payment made by each
+--       customer and rank results from highest to lowest.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       MAX(amount) AS highest_payment
+FROM payment
+GROUP BY customer_id
+ORDER BY highest_payment DESC;
+
+-- ---------------------------------------------------------
+-- 15. Calculate lowest payment by customer
+-- Goal: Identify the minimum single payment made by each
+--       customer and sort by customer identifier.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       MIN(amount) AS lowest_payment
+FROM payment
+GROUP BY customer_id
+ORDER BY customer_id ASC;
+
+-- ---------------------------------------------------------
+-- 16. Count payments by customer
+-- Goal: Measure payment frequency at the customer level and
+--       rank customers by number of payments.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       COUNT(*) AS number_of_payments
 FROM payment
 GROUP BY customer_id
 ORDER BY number_of_payments DESC;
 
-
--- 8) Find the total amount paid by each staff member.
--- Table: payment
--- Show: staff_id, total_amount_paid
-SELECT staff_id, sum(amount) AS total_amount_paid
+-- ---------------------------------------------------------
+-- 17. Calculate total amount handled by each staff member
+-- Goal: Measure the total payment volume processed by each
+--       staff member.
+-- ---------------------------------------------------------
+SELECT staff_id,
+       SUM(amount) AS total_amount_paid
 FROM payment
 GROUP BY staff_id;
 
-
--- 9) Find the average payment amount handled by each staff member.
--- Table: payment
--- Show: staff_id, avg_payment_amount
-SELECT staff_id, avg(amount) AS avg_payment_amount
+-- ---------------------------------------------------------
+-- 18. Calculate average payment handled by each staff member
+-- Goal: Measure the average payment amount processed by each
+--       staff member.
+-- ---------------------------------------------------------
+SELECT staff_id,
+       AVG(amount) AS avg_payment_amount
 FROM payment
 GROUP BY staff_id;
 
-
-
--- 10) Count how many rentals were processed by each staff member.
--- Table: rental
--- Show: staff_id, number_of_rentals
-SELECT staff_id, count(*) AS number_of_rentals
+-- ---------------------------------------------------------
+-- 19. Count rentals processed by staff member
+-- Goal: Measure rental transaction volume by staff member.
+-- ---------------------------------------------------------
+SELECT staff_id,
+       COUNT(*) AS number_of_rentals
 FROM rental
 GROUP BY staff_id;
 
+-- =========================================================
+-- Section 3: Multi-column grouping
+-- =========================================================
 
--- 11) Count how many films belong to each rating and rental_rate combination.
--- Table: film
--- Show: rating, rental_rate, number_of_films
--- Sort by rating, then rental_rate
-SELECT rating, rental_rate, count(*) AS number_of_films
-FROM film 
-GROUP BY rating, rental_rate
-ORDER BY rating, rental_rate;
-
-
--- 12) Find the average film length for each rating and rental_rate combination.
--- Table: film
--- Show: rating, rental_rate, avg_length
-SELECT rating, rental_rate, avg(length) AS avg_length
+-- ---------------------------------------------------------
+-- 20. Count films by rating and rental rate
+-- Goal: Measure film counts at the intersection of rating
+--       and rental rate.
+-- ---------------------------------------------------------
+SELECT rating,
+       rental_rate,
+       COUNT(*) AS number_of_films
 FROM film
-GROUP BY rating, rental_rate;
+GROUP BY rating,
+         rental_rate
+ORDER BY rating ASC,
+         rental_rate ASC;
 
-
--- 13) Count how many films belong to each rating and language_id combination.
--- Table: film
--- Show: rating, language_id, number_of_films
-SELECT rating, language_id, count(*) AS number_of_films
+-- ---------------------------------------------------------
+-- 21. Calculate average film length by rating and rental rate
+-- Goal: Measure average runtime for each combined rating and
+--       rental rate group.
+-- ---------------------------------------------------------
+SELECT rating,
+       rental_rate,
+       AVG(length) AS avg_length
 FROM film
-GROUP BY rating, language_id;
+GROUP BY rating,
+         rental_rate;
 
+-- ---------------------------------------------------------
+-- 22. Count films by rating and language
+-- Goal: Measure film counts across rating and language_id
+--       combinations.
+-- ---------------------------------------------------------
+SELECT rating,
+       language_id,
+       COUNT(*) AS number_of_films
+FROM film
+GROUP BY rating,
+         language_id;
 
-
--- 14) Find the total payment amount for each customer and staff combination.
--- Table: payment
--- Show: customer_id, staff_id, total_paid
-SELECT customer_id, staff_id, sum(amount) AS total_paid
+-- ---------------------------------------------------------
+-- 23. Calculate total payment amount by customer and staff
+-- Goal: Measure payment totals for each customer-staff
+--       combination.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       staff_id,
+       SUM(amount) AS total_paid
 FROM payment
-GROUP BY customer_id, staff_id;
+GROUP BY customer_id,
+         staff_id;
 
-
-
--- 15) Count how many customers are active and inactive.
--- Table: customer
--- Show: activebool, number_of_customers
-SELECT activebool, count(*) AS number_of_customers
+-- ---------------------------------------------------------
+-- 24. Count customers by active status
+-- Goal: Measure the number of active and inactive customers.
+-- ---------------------------------------------------------
+SELECT activebool,
+       COUNT(*) AS number_of_customers
 FROM customer
 GROUP BY activebool;
 
-
--- 16) Find the total amount paid on each payment date.
--- Table: payment
--- Show: payment_date, total_amount
--- Sort by payment_date ascending
-SELECT payment_date::date, sum(amount) AS total_amount
+-- ---------------------------------------------------------
+-- 25. Calculate total payment amount by payment date
+-- Goal: Aggregate payments at the calendar-date level.
+-- ---------------------------------------------------------
+SELECT payment_date::date AS payment_day,
+       SUM(amount) AS total_amount
 FROM payment
-GROUP BY payment_date::date 
-ORDER BY payment_date::date ASC;
+GROUP BY payment_date::date
+ORDER BY payment_day ASC;
 
+-- =========================================================
+-- Section 4: WHERE before GROUP BY
+-- =========================================================
 
--- 17) Find the total amount paid by each customer, but only for customers with customer_id less than 10.
--- Table: payment
--- Show: customer_id, total_paid
-SELECT customer_id, sum(amount) AS total_paid
+-- ---------------------------------------------------------
+-- 26. Calculate total paid by customers with ID below 10
+-- Goal: Filter rows before aggregation and then compute
+--       total payments per qualifying customer.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       SUM(amount) AS total_paid
 FROM payment
-WHERE customer_id <10
+WHERE customer_id < 10
 GROUP BY customer_id;
 
-
--- 18) Count how many films there are in each rating, but only for films longer than 120 minutes.
--- Table: film
--- Show: rating, number_of_films
-SELECT rating, count(*) AS number_of_films
+-- ---------------------------------------------------------
+-- 27. Count long films by rating
+-- Goal: Filter films longer than 120 minutes before grouping
+--       and count how many remain in each rating category.
+-- ---------------------------------------------------------
+SELECT rating,
+       COUNT(*) AS number_of_films
 FROM film
 WHERE length > 120
 GROUP BY rating;
 
-
-
--- 19) Find the average payment amount for each customer, but only for payments greater than 5.00.
--- Table: payment
--- Show: customer_id, avg_payment
-SELECT customer_id, avg(amount) AS avg_payment
+-- ---------------------------------------------------------
+-- 28. Calculate average payment by customer for payments
+--     greater than 5.00
+-- Goal: Filter high-value payments before computing customer-
+--       level averages.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       AVG(amount) AS avg_payment
 FROM payment
 WHERE amount > 5
 GROUP BY customer_id;
 
+-- =========================================================
+-- Section 5: HAVING after GROUP BY
+-- =========================================================
 
--- 20) Find the total payment amount for each customer.
--- Table: payment
--- Show: customer_id, total_paid
--- Return only customers whose total_paid is greater than 200
-SELECT customer_id, sum(amount) AS total_paid
+-- ---------------------------------------------------------
+-- 29. Return customers whose total payments exceed 200
+-- Goal: Filter grouped customer totals using HAVING.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       SUM(amount) AS total_paid
 FROM payment
 GROUP BY customer_id
-HAVING sum(amount) > 200;
+HAVING SUM(amount) > 200;
 
-
-
-
--- 21) Count how many payments each customer made.
--- Table: payment
--- Show: customer_id, number_of_payments
--- Return only customers who made more than 30 payments
-
-SELECT customer_id, count(*) AS number_of_payments
+-- ---------------------------------------------------------
+-- 30. Return customers with more than 30 payments
+-- Goal: Filter grouped payment counts using HAVING.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       COUNT(*) AS number_of_payments
 FROM payment
 GROUP BY customer_id
-HAVING count(*) > 30;
+HAVING COUNT(*) > 30;
 
--- 22) Find the average film length for each rating.
--- Table: film
--- Show: rating, avg_length
--- Return only ratings where avg_length is greater than 110
-SELECT rating, avg(length) AS avg_length
-FROM film
-GROUP BY rating 
-HAVING avg(length) > 110;
-
-
--- 23) Count how many films exist for each rental_rate.
--- Table: film
--- Show: rental_rate, number_of_films
--- Return only rental_rate groups with more than 300 films
-SELECT rental_rate, count(*) AS number_of_films
-FROM film
-GROUP BY rental_rate
-HAVING count(*) > 300;
-
-
--- 24) Find the total amount paid by each customer and each staff member.
--- Table: payment
--- Show: customer_id, staff_id, total_paid
--- Return only combinations where total_paid is greater than 50
-SELECT customer_id, staff_id, sum(amount) AS total_paid
-FROM payment
-GROUP BY customer_id, staff_id
-HAVING sum(amount) >50;
-
-
--- 25) Count how many films exist for each rating.
--- Table: film
--- Show: rating, number_of_films
--- Sort by number_of_films descending
--- Return only the top 3 groups
-SELECT rating, count(*) AS number_of_films
+-- ---------------------------------------------------------
+-- 31. Return ratings with average film length above 110
+-- Goal: Filter grouped average runtimes using HAVING.
+-- ---------------------------------------------------------
+SELECT rating,
+       AVG(length) AS avg_length
 FROM film
 GROUP BY rating
-ORDER BY count(*) DESC
+HAVING AVG(length) > 110;
+
+-- ---------------------------------------------------------
+-- 32. Return rental rates with more than 300 films
+-- Goal: Filter grouped film counts using HAVING.
+-- ---------------------------------------------------------
+SELECT rental_rate,
+       COUNT(*) AS number_of_films
+FROM film
+GROUP BY rental_rate
+HAVING COUNT(*) > 300;
+
+-- ---------------------------------------------------------
+-- 33. Return customer-staff combinations with total paid
+--     greater than 50
+-- Goal: Filter grouped payment totals for combined customer
+--       and staff groupings.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       staff_id,
+       SUM(amount) AS total_paid
+FROM payment
+GROUP BY customer_id,
+         staff_id
+HAVING SUM(amount) > 50;
+
+-- =========================================================
+-- Section 6: GROUP BY with ORDER BY and LIMIT
+-- =========================================================
+
+-- ---------------------------------------------------------
+-- 34. Return the top 3 rating groups by film count
+-- Goal: Rank rating groups by number of films and keep only
+--       the largest three.
+-- ---------------------------------------------------------
+SELECT rating,
+       COUNT(*) AS number_of_films
+FROM film
+GROUP BY rating
+ORDER BY number_of_films DESC
 LIMIT 3;
 
-
--- 26) Find the average payment amount for each customer.
--- Table: payment
--- Show: customer_id, avg_payment
--- Sort by avg_payment descending
--- Return only 5 rows
-SELECT customer_id, avg(amount) AS avg_payment
+-- ---------------------------------------------------------
+-- 35. Return the top 5 customers by average payment
+-- Goal: Rank customers by average payment amount and keep
+--       the top five results.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       AVG(amount) AS avg_payment
 FROM payment
 GROUP BY customer_id
 ORDER BY avg_payment DESC
 LIMIT 5;
 
+-- =========================================================
+-- Section 7: Combined aggregate analysis
+-- =========================================================
 
-
--- 27) Find the maximum and minimum film length for each rating.
--- Table: film
--- Show: rating, max_length, min_length
-SELECT rating, max(length) AS max_length, min(length) AS min_length
+-- ---------------------------------------------------------
+-- 36. Calculate maximum and minimum film length by rating
+-- Goal: Compare upper and lower runtime bounds within each
+--       rating group.
+-- ---------------------------------------------------------
+SELECT rating,
+       MAX(length) AS max_length,
+       MIN(length) AS min_length
 FROM film
 GROUP BY rating;
 
-
-
--- 28) Find the total, average, minimum, and maximum payment amount for each customer.
--- Table: payment
--- Show: customer_id, total_paid, avg_payment, min_payment, max_payment
-SELECT customer_id, sum(amount) AS total_paid, avg(amount) AS avg_payment, min(amount) AS min_payment, max(amount) AS max_payment
+-- ---------------------------------------------------------
+-- 37. Calculate multiple payment aggregates by customer
+-- Goal: Summarize total, average, minimum, and maximum
+--       payment values at the customer level.
+-- ---------------------------------------------------------
+SELECT customer_id,
+       SUM(amount) AS total_paid,
+       AVG(amount) AS avg_payment,
+       MIN(amount) AS min_payment,
+       MAX(amount) AS max_payment
 FROM payment
 GROUP BY customer_id;
 
-
-
--- 29) Count how many films exist for each rating and replacement_cost combination.
--- Table: film
--- Show: rating, replacement_cost, number_of_films
--- Sort by rating, then number_of_films descending
-SELECT rating, replacement_cost, count(*) AS number_of_films
+-- ---------------------------------------------------------
+-- 38. Count films by rating and replacement cost
+-- Goal: Measure film counts across rating and replacement
+--       cost combinations and rank counts within rating.
+-- ---------------------------------------------------------
+SELECT rating,
+       replacement_cost,
+       COUNT(*) AS number_of_films
 FROM film
-GROUP BY rating, replacement_cost
-ORDER BY rating, number_of_films DESC;
+GROUP BY rating,
+         replacement_cost
+ORDER BY rating ASC,
+         number_of_films DESC;
 
-
--- 30) Find which rating has the largest average film length.
--- Table: film
--- Show: rating, avg_length
--- Sort properly and return 1 row
-SELECT rating, avg(length) AS avg_length
+-- ---------------------------------------------------------
+-- 39. Identify the rating with the largest average runtime
+-- Goal: Rank ratings by average film length and return the
+--       highest one.
+-- ---------------------------------------------------------
+SELECT rating,
+       AVG(length) AS avg_length
 FROM film
 GROUP BY rating
-ORDER BY avg(length) DESC
+ORDER BY avg_length DESC
 LIMIT 1;
