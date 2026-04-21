@@ -2,3 +2,20 @@
 .idea/
 .vscode/
 *.log
+
+# Local PostgreSQL exports and restores
+*.dump
+*.backup
+*.sql.gz
+*.tar
+
+# Generated result files kept out unless intentionally curated
+results/**/*.csv
+results/**/*.tsv
+results/**/*.json
+results/**/*.html
+results/**/*.txt
+
+# OS and editor noise
+Thumbs.db
+*.swp
