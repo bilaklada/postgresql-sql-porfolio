@@ -1,173 +1,65 @@
-# SQL Portfolio Learning Roadmap
+# Learning Roadmap
 
-## Purpose of this document
+I use this roadmap to keep the repository disciplined. The goal is not to collect
+random SQL snippets. The goal is to show steady growth from foundations toward
+analysis, validation, and PostgreSQL-specific work.
 
-This document defines the structure of the repository and the logic behind the learning progression.
+## 1. Understand the schema first
 
-The repository is not meant to be a random collection of SQL files. It is meant to show disciplined growth from foundational SQL toward advanced analytical and PostgreSQL-specific work.
+Before writing analysis queries, I inspect:
 
-The progression is designed around four ideas:
+- tables and columns
+- primary keys and foreign keys
+- bridge tables
+- date columns
+- nullable columns
+- row counts by table
 
-1. understand relational data before writing complex queries
-2. write readable and maintainable SQL
-3. validate results instead of trusting the first output
-4. connect SQL techniques to realistic business questions
+This protects me from writing joins before I understand the grain of each table.
 
----
+## 2. Build SQL fundamentals
 
-## Stage 1 — Foundations
+The foundation scripts cover filtering, sorting, grouping, `HAVING`, `CASE`,
+NULL logic, date handling, and basic aggregations. I keep these files because
+good advanced SQL still depends on clean basics.
 
-Goal:
-Build a reliable base in core SQL syntax and basic analytical thinking.
+## 3. Practice joins with grain in mind
 
-Topics:
-- `SELECT`
-- `WHERE`
-- `ORDER BY`
-- `GROUP BY`
-- `HAVING`
-- `CASE WHEN`
-- `NULL` handling
-- dates and timestamps
-- simple aggregations
+The join scripts focus on more than syntax. I practice:
 
-Expected outcome:
-The author can write clear basic queries and understands the difference between row-level filtering and aggregated analysis.
+- preserving the expected row count
+- recognizing one-to-many joins
+- using bridge tables correctly
+- choosing `EXISTS` when I only need to test presence
+- using anti-joins for missing relationship checks
 
----
+## 4. Structure multi-step logic
 
-## Stage 2 — Joins and relational thinking
+The advanced query scripts use subqueries, CTEs, recursive CTEs, set operations,
+and `LATERAL`. I use these tools when they make the logic easier to review or
+when they express a pattern better than one large nested query.
 
-Goal:
-Understand how tables relate to each other and how joins affect row counts, duplicates, and missing values.
+## 5. Add analytical SQL
 
-Topics:
-- `INNER JOIN`
-- `LEFT JOIN`
-- self joins
-- multi-table joins
-- `EXISTS`
-- `NOT EXISTS`
-- semi-joins
-- anti-joins
-- duplication risks after joins
+The analytics scripts use window functions for ranking, running totals, period
+comparison, top-N logic, percentiles, and segmentation. These are the patterns I
+expect to discuss in analytics engineering and SQL interviews.
 
-Expected outcome:
-The author can safely combine multiple tables and explain why a join does or does not preserve the expected grain of the result.
+## 6. Show PostgreSQL depth
 
----
+The database object and PostgreSQL-specific folders show that I understand SQL
+inside a database system, not only as a reporting language. I include examples
+for views, materialized views, constraints, indexes, transactions, explain
+plans, JSONB, full-text search, partitioning, and catalog metadata.
 
-## Stage 3 — Advanced query construction
+## 7. Validate results
 
-Goal:
-Break down more complex logic into structured SQL steps.
+I treat validation as a normal part of query development. The quality checks
+folder contains reusable patterns for row counts, duplicates, null checks, and
+foreign-key consistency.
 
-Topics:
-- subqueries
-- correlated subqueries
-- CTEs
-- recursive CTEs
-- set operations
-- `LATERAL`
-- reusable analytical patterns
+## 8. Communicate through projects
 
-Expected outcome:
-The author can write multi-step SQL in a way that remains readable and logically controlled.
-
----
-
-## Stage 4 — Analytical SQL
-
-Goal:
-Use SQL for ranking, comparisons, segmentation, and time-aware analysis.
-
-Topics:
-- window functions
-- ranking functions
-- running totals
-- `LAG` and `LEAD`
-- top-N per group
-- percentiles
-- customer and revenue segmentation
-
-Expected outcome:
-The author can solve realistic analytical tasks using SQL instead of relying only on spreadsheets or external tools.
-
----
-
-## Stage 5 — Database objects and PostgreSQL depth
-
-Goal:
-Show awareness of how SQL fits into database engineering, not only analysis.
-
-Topics:
-- views
-- materialized views
-- constraints
-- indexes
-- `EXPLAIN`
-- `EXPLAIN ANALYZE`
-- transactions
-- `ON CONFLICT`
-- `MERGE`
-- `JSONB`
-- schema and catalog introspection
-
-Expected outcome:
-The author can discuss how PostgreSQL supports reliable and maintainable data work beyond writing a single query.
-
----
-
-## Stage 6 — Validation and professional habits
-
-Goal:
-Treat SQL as a professional workflow where outputs must be checked and defended.
-
-Topics:
-- row-count checks
-- duplicate detection
-- reconciliation queries
-- null audits
-- foreign key consistency checks
-- edge-case validation for windows and aggregations
-
-Expected outcome:
-The author does not present results without checking whether they are trustworthy.
-
----
-
-## Stage 7 — Portfolio case studies
-
-Goal:
-Turn technical SQL knowledge into portfolio-grade business examples.
-
-Case studies should include:
-- business question
-- stakeholder perspective
-- tables used
-- grain of analysis
-- assumptions
-- main SQL solution
-- validation queries
-- findings summary
-
-Expected outcome:
-The repository becomes useful in interviews because it shows not only syntax, but also analytical reasoning and communication.
-
----
-
-## How this roadmap should shape the repository
-
-Each folder should represent a real stage of maturity.
-
-The repo should move from:
-- isolated syntax practice
-
-toward:
-- structured analytical modules
-- validation-driven SQL
-- PostgreSQL-specific demonstrations
-- interview-ready business projects
-
-This is the core principle of the repository:
-**clean SQL, clear logic, validated outputs, and visible relational understanding.**
+The projects turn technical SQL into interview-ready analysis. Each project has
+a question, assumptions, SQL solution, validation, findings, and a short note on
+why the project matters.

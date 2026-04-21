@@ -1,72 +1,64 @@
 # Query Style Guide
 
-## Purpose
-
-This style guide defines how SQL should be written across the repository.
-
-The goal is not only to make queries work, but to make them:
-- readable
-- reviewable
-- maintainable
-- easier to validate
-- easier to explain in an interview
-
-This repository uses PostgreSQL syntax and should prefer clarity over cleverness.
-
----
+I write SQL in this repository as if another engineer will review it. The goal
+is not only to get a correct result, but to make the logic readable,
+maintainable, and defensible.
 
 ## Core principles
 
-### 1. Write for readability first
+- Define the intended grain before the main query.
+- Select explicit columns in portfolio queries.
+- Use readable aliases, usually the first letter or short table name.
+- Keep join predicates complete and visible.
+- Prefer CTEs when they make multi-step logic easier to validate.
+- Use `COUNT(DISTINCT ...)` deliberately, not as a shortcut for unclear joins.
+- Add validation queries for important outputs.
 
-A query should be understandable by another engineer reading it later.
+## Formatting
 
-Good SQL is not only short SQL.  
-Good SQL makes the logic easy to follow.
-
-### 2. Prefer explicitness
-
-Be explicit about:
-- selected columns
-- join conditions
-- grouping logic
-- sort order
-- assumptions
-
-Avoid hidden logic and ambiguous output.
-
-### 3. Preserve result grain consciously
-
-Every analytical query should have a clearly understood grain.
-
-Examples:
-- one row per customer
-- one row per store and month
-- one row per film category
-- one row per rental
-
-If the grain is unclear, the query is not ready.
-
-### 4. Validate important outputs
-
-Joins, aggregations, and window functions can all produce misleading results if the grain is wrong.
-
-Queries should be supported by validation logic where appropriate.
-
----
-
-## Formatting rules
-
-### SQL keywords
-
-Write SQL keywords in uppercase.
-
-Example:
 ```sql
 SELECT
     c.customer_id,
     c.first_name,
-    c.last_name
+    c.last_name,
+    SUM(p.amount) AS total_amount
 FROM customer AS c
-WHERE c.active = 1
-ORDER BY c.customer_id;
+INNER JOIN payment AS p
+    ON p.customer_id = c.customer_id
+GROUP BY
+    c.customer_id,
+    c.first_name,
+    c.last_name
+ORDER BY total_amount DESC;
+```
+
+## CTE structure
+
+When a query has multiple steps, I name each CTE after its role:
+
+- `base_*` for row-level source shaping
+- `*_summary` for aggregated outputs
+- `ranked_*` for windowed ranking
+- `final` for the final selected result when useful
+
+## Comments
+
+I use comments to explain assumptions, grain, and validation intent. I avoid
+comments that simply repeat the SQL keyword.
+
+Useful comment:
+
+```sql
+-- Grain: one row per customer and rental month.
+```
+
+Weak comment:
+
+```sql
+-- Select columns from customer.
+```
+
+## Validation habit
+
+For project queries, I expect at least one validation query. For larger outputs,
+I usually check totals, row counts, nulls, or duplicate keys.
