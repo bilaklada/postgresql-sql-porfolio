@@ -7,50 +7,52 @@
 -- =========================================================
 
 -- Customer value and recency segmentation.
-WITH customer_metrics AS (
+WITH customer_revenue AS (
     SELECT
-        c.customer_id,
-        c.first_name,
-        c.last_name,
-        SUM(p.amount) AS total_revenue,
-        COUNT(DISTINCT r.rental_id) AS rental_count,
+        p.customer_id,
+        SUM(p.amount) AS total_revenue
+    FROM payment AS p
+    GROUP BY p.customer_id
+),
+customer_rentals AS (
+    SELECT
+        r.customer_id,
+        COUNT(*) AS rental_count,
         MAX(r.rental_date)::date AS last_rental_date
-    FROM customer AS c
-    LEFT JOIN payment AS p
-        ON p.customer_id = c.customer_id
-    LEFT JOIN rental AS r
-        ON r.rental_id = p.rental_id
-    GROUP BY
-        c.customer_id,
-        c.first_name,
-        c.last_name
+    FROM rental AS r
+    GROUP BY r.customer_id
 ),
 dataset_bounds AS (
     SELECT MAX(rental_date)::date AS max_rental_date
     FROM rental
 )
 SELECT
-    cm.customer_id,
-    cm.first_name,
-    cm.last_name,
-    COALESCE(cm.total_revenue, 0) AS total_revenue,
-    COALESCE(cm.rental_count, 0) AS rental_count,
-    db.max_rental_date - cm.last_rental_date AS days_since_last_rental,
+    c.customer_id,
+    c.first_name,
+    c.last_name,
+    COALESCE(cr.total_revenue, 0) AS total_revenue,
+    COALESCE(rt.rental_count, 0) AS rental_count,
+    db.max_rental_date - rt.last_rental_date AS days_since_last_rental,
     CASE
-        WHEN COALESCE(cm.total_revenue, 0) >= 200 THEN 'high_value'
-        WHEN COALESCE(cm.total_revenue, 0) >= 100 THEN 'mid_value'
+        WHEN COALESCE(cr.total_revenue, 0) >= 200 THEN 'high_value'
+        WHEN COALESCE(cr.total_revenue, 0) >= 100 THEN 'mid_value'
         ELSE 'low_value'
     END AS value_segment,
     CASE
-        WHEN db.max_rental_date - cm.last_rental_date <= 30 THEN 'recent'
-        WHEN db.max_rental_date - cm.last_rental_date <= 90 THEN 'cooling'
+        WHEN db.max_rental_date - rt.last_rental_date <= 30 THEN 'recent'
+        WHEN db.max_rental_date - rt.last_rental_date <= 90 THEN 'cooling'
+        WHEN rt.last_rental_date IS NULL THEN 'no_rentals'
         ELSE 'inactive_or_old'
     END AS recency_segment
-FROM customer_metrics AS cm
+FROM customer AS c
+LEFT JOIN customer_revenue AS cr
+    ON cr.customer_id = c.customer_id
+LEFT JOIN customer_rentals AS rt
+    ON rt.customer_id = c.customer_id
 CROSS JOIN dataset_bounds AS db
 ORDER BY
     total_revenue DESC,
-    cm.customer_id;
+    c.customer_id;
 
 -- Validate customer segment counts.
 WITH customer_revenue AS (
